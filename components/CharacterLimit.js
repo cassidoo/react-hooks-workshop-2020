@@ -7,7 +7,10 @@ import { useState } from 'react'
 
 // Note: Notice the CSS classes for if the input is too long!
 
-const CharacterLimitInput = ({ text, defaults }) => {
+const CharacterLimitInput = ({
+  text,
+  defaults,
+}) => {
   const maxLength = 140
 
   return (
@@ -29,10 +32,14 @@ export default function MoodTracker() {
   return (
     <section>
       <h2>Mood Tracker</h2>
-      <CharacterLimitInput text={'How was your day?'} defaults={defaultMoods} />
+      <CharacterLimitInput
+        text={'How was your day?'}
+        defaults={defaultMoods}
+      />
       <style jsx global>{`
         section {
-          font-family: 'Helvetica', 'Arial', sans-serif;
+          font-family: 'Helvetica', 'Arial',
+            sans-serif;
           line-height: 1.3;
           text-align: center;
         }

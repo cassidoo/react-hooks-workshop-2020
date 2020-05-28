@@ -15,6 +15,7 @@ const Badge = ({
   children,
   color,
   dismissable,
+  ...props
 }) => {
   let [dismissed, setDismissed] = useState(false)
 
@@ -24,8 +25,9 @@ const Badge = ({
     <span
       className={`badge ${color}`}
       onClick={() => {
-        setDismissed(true)
+        if (dismissable) setDismissed(true)
       }}
+      {...props}
     >
       {children}
     </span>

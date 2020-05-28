@@ -1,28 +1,145 @@
-import { Fragment, useState } from 'react'
+import {
+  Fragment,
+  useState,
+  createContext,
+  useContext,
+} from 'react'
 import Description from '@components/Description'
 
-function Accordion({ data }) {
-  const [activeIndex, setActiveIndex] = useState(0)
+function Accordion({
+  data,
+  position = 'top',
+  disabled = [],
+}) {
+  const [activeIndex, setActiveIndex] = useState(
+    0
+  )
+
   return (
     <div data-accordion>
       {data.map((tab, index) => {
         const isActive = index === activeIndex
+        const isDisabled = disabled.includes(
+          index
+        )
+
+        const title = (
+          <div
+            data-panel-title
+            className={
+              isDisabled
+                ? 'disabled'
+                : isActive
+                ? 'expanded'
+                : ''
+            }
+            onClick={() => {
+              if (!isDisabled)
+                setActiveIndex(index)
+            }}
+          >
+            <span>{tab.label}</span>
+            <span>{tab.icon}</span>
+          </div>
+        )
+
+        const content = (
+          <div
+            data-panel-content
+            className={isActive ? 'expanded' : ''}
+          >
+            {tab.content}
+          </div>
+        )
+
         return (
           <Fragment key={index}>
-            <div
-              data-panel-title
-              className={isActive ? 'expanded' : ''}
-              onClick={() => setActiveIndex(index)}
-            >
-              <span>{tab.label}</span>
-              <span>{tab.icon}</span>
-            </div>
-            <div data-panel-content className={isActive ? 'expanded' : ''}>
-              {tab.content}
-            </div>
+            {position === 'bottom'
+              ? [content, title]
+              : [title, content]}
           </Fragment>
         )
       })}
+    </div>
+  )
+}
+
+let AccordionContext = createContext()
+
+function AccordionCC({ children }) {
+  const [activeIndex, setActiveIndex] = useState(
+    0
+  )
+
+  return (
+    <div data-accordion>
+      {children.map((child, index) => {
+        return (
+          <AccordionContext.Provider
+            value={{
+              activeIndex,
+              setActiveIndex,
+              index,
+            }}
+          >
+            {child}
+          </AccordionContext.Provider>
+        )
+      })}
+    </div>
+  )
+}
+
+let SectionContext = createContext()
+
+function Section({ children, disabled }) {
+  return (
+    <SectionContext.Provider value={{ disabled }}>
+      <div data-section>{children}</div>
+    </SectionContext.Provider>
+  )
+}
+
+function Title({ children }) {
+  let {
+    activeIndex,
+    setActiveIndex,
+    index,
+  } = useContext(AccordionContext)
+  let isActive = index === activeIndex
+  let { disabled } = useContext(SectionContext)
+
+  return (
+    <div
+      data-panel-title
+      className={
+        disabled
+          ? 'disabled'
+          : isActive
+          ? 'expanded'
+          : ''
+      }
+      onClick={() => {
+        if (!disabled) setActiveIndex(index)
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+function Content({ children }) {
+  let { activeIndex, index } = useContext(
+    AccordionContext
+  )
+  let isActive = index === activeIndex
+
+  return (
+    <div
+      data-panel-content
+      className={isActive ? 'expanded' : ''}
+    >
+      {children}
     </div>
   )
 }
@@ -48,7 +165,34 @@ function App() {
 
   return (
     <div className="App">
-      <Accordion data={data} />
+      {/* <Accordion data={data} position="top" /> */}
+      <AccordionCC>
+        <Section>
+          <Title>
+            Paris <span>🧀</span>
+          </Title>
+          <Content>
+            <Description city="paris" />
+          </Content>
+        </Section>
+        <Section disabled>
+          <Title>
+            <span>⛷</span>Lech
+          </Title>
+          <Content>
+            <Description city="lech" />
+          </Content>
+        </Section>
+        <Section>
+          <Title>
+            Madrid <span>🍷</span>
+          </Title>
+          <Content>
+            <Description city="madrid" />
+          </Content>
+        </Section>
+      </AccordionCC>
+
       <style jsx global>{`
         .App {
           position: absolute;
@@ -72,7 +216,8 @@ function App() {
           border-top: 1px solid #edf2f8;
           border-bottom: 1px solid white;
           cursor: pointer;
-          transition: border 0.2s, font-weight 0.2s;
+          transition: border 0.2s,
+            font-weight 0.2s;
         }
         [data-panel-title]::before {
           display: inline;
@@ -107,7 +252,8 @@ function App() {
           height: 0;
           padding: 0;
           font-size: 0;
-          transition: height 0.2s, visibility 0.2s, padding 0.2s;
+          transition: height 0.2s, visibility 0.2s,
+            padding 0.2s;
         }
         [data-panel-content].expanded {
           visibility: visible;

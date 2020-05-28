@@ -5,7 +5,9 @@ import { useState, useEffect } from 'react'
 
 // Good non-API example hook:
 function useMedia(query) {
-  const [matches, setMatches] = useState(window.matchMedia(query).matches)
+  const [matches, setMatches] = useState(
+    window.matchMedia(query).matches
+  )
 
   useEffect(() => {
     const media = window.matchMedia(query)
@@ -25,7 +27,10 @@ function useMedia(query) {
 export default function EffectExample() {
   return (
     <>
-      <div>Look at the code to look at the examples! EffectExample.js :)</div>
+      <div>
+        Look at the code to look at the examples!
+        EffectExample.js :)
+      </div>
     </>
   )
 }

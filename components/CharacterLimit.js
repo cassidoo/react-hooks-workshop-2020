@@ -11,17 +11,41 @@ const CharacterLimitInput = ({
   text,
   defaults,
 }) => {
-  const maxLength = 140
+  const [message, setMessage] = useState('')
+  const maxLength = 20
 
   return (
-    <div className="counterInput">
+    <div
+      className={`counterInput ${
+        message.length > maxLength
+          ? 'tooLong'
+          : ''
+      }`}
+    >
       <div>
         {defaults.map((b) => {
-          return <button key={b}>{b}</button>
+          return (
+            <button
+              key={b}
+              onClick={() => {
+                setMessage(message + b)
+              }}
+            >
+              {b}
+            </button>
+          )
         })}
       </div>
-      <textarea placeholder={text} />
-      <div>0/{maxLength}</div>
+      <textarea
+        placeholder={text}
+        value={message}
+        onChange={(event) => {
+          setMessage(event.target.value)
+        }}
+      />
+      <div>
+        {message.length}/{maxLength}
+      </div>
     </div>
   )
 }

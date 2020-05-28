@@ -1,5 +1,41 @@
-import { useState } from 'react'
+import { useState, useReducer } from 'react'
 import friendlyWords from 'friendly-words'
+
+let array = [1, 2, 3, 4, 5]
+let add = (x, y) => x + y
+let sum = array.reduce(add, 0)
+
+// 0 + 1
+// 1 + 2
+// 3 + 3
+// 6 + 4
+// 10 + 5
+
+let initialState = { count: 0, cake: true }
+let actions = [
+  { type: 'ADD', by: 2 },
+  { type: 'MINUS', by: 4 },
+  { type: 'EAT_CAKE' },
+]
+
+function reducer(state, action) {
+  if (action.type === 'ADD') {
+    return {
+      ...state,
+      count: state.count + action.by,
+    }
+  } else if (action.type === 'MINUS') {
+    return {
+      ...state,
+      count: state.count - action.by,
+    }
+  } else if (action.type === 'EAT_CAKE') {
+    return { ...state, cake: false }
+  }
+  return state
+}
+
+console.log(actions.reduce(reducer, initialState))
 
 let backgrounds = [
   'Noble',
@@ -13,37 +49,127 @@ let backgrounds = [
 ]
 
 function randomBackground() {
-  return backgrounds[Math.floor(Math.random() * backgrounds.length)]
+  return backgrounds[
+    Math.floor(Math.random() * backgrounds.length)
+  ]
 }
 
 function randomName() {
   let array = friendlyWords.predicates
-  let string = array[Math.floor(Math.random() * array.length)]
-  return string.charAt(0).toUpperCase() + string.slice(1)
+  let string =
+    array[
+      Math.floor(Math.random() * array.length)
+    ]
+  return (
+    string.charAt(0).toUpperCase() +
+    string.slice(1)
+  )
+}
+
+function useMyState(initialValue) {
+  let [state, dispatch] = useReducer(
+    (state, action) => state,
+    initialValue
+  )
+  return [state, dispatch]
+}
+
+function useCharacterReducer() {
+  let [state, dispatch] = useReducer(
+    (state, action) => {
+      switch (action.type) {
+        case 'BACKGROUND_SELECTED': {
+          return {
+            ...state,
+            background: action.value,
+          }
+        }
+        case 'BG_NOT_EXIST': {
+          return {
+            ...state,
+            error: 'Background does not exist',
+          }
+        }
+        case 'NO_ERRORS': {
+          return { ...state, error: null }
+        }
+        case 'LONG_NAME': {
+          return {
+            ...state,
+            error: 'Name is WAY too long, bucko.',
+          }
+        }
+        case 'TOGGLE_DARK_MODE': {
+          return {
+            ...state,
+            darkMode: !state.darkMode,
+          }
+        }
+        case 'SET_NAME': {
+          return { ...state, name: action.name }
+        }
+        case 'RANDOMIZE': {
+          return {
+            ...state,
+            name: randomName(),
+            background: randomBackground(),
+          }
+        }
+      }
+    },
+    {
+      darkMode: false,
+      name: '',
+      background: '',
+      error: null,
+    }
+  )
+
+  return [state, dispatch]
 }
 
 export default function App() {
-  let [darkMode, setDarkMode] = useState(false)
-  let [name, setName] = useState('')
-  let [background, setBackground] = useState('')
-  let [error, setError] = useState(null)
+  let [state, dispatch] = useCharacterReducer()
+
+  let {
+    darkMode,
+    name,
+    background,
+    error,
+  } = state
+
+  // let [darkMode, setDarkMode] = useState(false)
+  // let [name, setName] = useState('')
+  // let [background, setBackground] = useState('')
+  // let [error, setError] = useState(null)
 
   function handleBackgroundSelect(event) {
     let value = event.target.value
-    setBackground(value)
+    dispatch({
+      type: 'BACKGROUND_SELECTED',
+      value,
+    })
+    // setBackground(value)
     if (!backgrounds.includes(value)) {
-      setError('This background does NOT exist.')
+      dispatch({ type: 'BG_NOT_EXIST' })
+      // setError('This background does NOT exist.')
     } else {
-      setError(null)
+      dispatch({ type: 'NO_ERRORS' })
+      // setError(null)
     }
   }
 
   return (
     <>
-      <div className={`App ${darkMode ? 'darkmode' : ''}`}>
+      <div
+        className={`App ${
+          darkMode ? 'darkmode' : ''
+        }`}
+      >
         <button
           onClick={() => {
-            setDarkMode(!darkMode)
+            dispatch({ type: 'TOGGLE_DARK_MODE' })
+            // setDarkMode(!darkMode)
           }}
         >
           Dark Mode {darkMode ? 'ON' : 'OFF'}
@@ -54,15 +180,27 @@ export default function App() {
           placeholder="Type your name"
           value={name}
           onChange={(event) => {
-            setName(event.target.value)
+            dispatch({
+              type: 'SET_NAME',
+              name: event.target.value,
+            })
+            // setName(event.target.value)
             if (event.target.value.length > 15) {
-              setError('Name is WAY too long, bucko.')
+              dispatch({ type: 'LONG_NAME' })
+              // setError(
+              //   'Name is WAY too long, bucko.'
+              // )
             }
           }}
         />
-        <select value={background} onChange={handleBackgroundSelect}>
+        <select
+          value={background}
+          onChange={handleBackgroundSelect}
+        >
           {backgrounds.map((b) => {
-            return <option key={`bg-${b}`}>{b}</option>
+            return (
+              <option key={`bg-${b}`}>{b}</option>
+            )
           })}
         </select>
         {error && (
@@ -70,7 +208,7 @@ export default function App() {
             {error}
             <button
               onClick={() => {
-                setError(null)
+                dispatch({ type: 'NO_ERRORS' })
               }}
             >
               Dismiss
@@ -83,6 +221,7 @@ export default function App() {
         </div>
         <button
           onClick={() => {
+            dispatch({ type: 'RANDOMIZE' })
             setName(randomName())
             setBackground(randomBackground())
           }}

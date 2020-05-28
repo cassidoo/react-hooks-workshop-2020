@@ -3,51 +3,21 @@ import React, {
   createContext,
 } from 'react'
 
-// Right now in the file 4-date-picker.js, we call these components with:
-// <DateFields
-//   value={...}
-//   start={...}
-//   end={...}
-//   onSelect={...}
-// />
-
-// We want to change it to:
-// <DateFields value={startDate} onChange={setStartDate}>
-//  <MonthField aria-label="Start Month" />
-//  <DayField aria-label="Start Day" />
-//  <YearField start={2018} end={2020} aria-label="Start year" />
-// </DateFields>
-
-// The tasks:
-// 1) Edit 4-date-picker.js to stop rendering the individual components
-// in DateFields and render children instead
-// 2) Provide Context in DateFields
-// 3) Use the Context in MonthField, DayField, and YearField.
+const DateFieldsContext = createContext()
 
 export default function DateFields({
-  start,
-  end,
+  children,
   value,
   onChange,
 }) {
+  let date = value
   return (
     <div>
-      <MonthField
-        date={value}
-        onChange={onChange}
-      />
-      /
-      <DayField
-        date={value}
-        onChange={onChange}
-      />
-      /
-      <YearField
-        date={value}
-        onChange={onChange}
-        start={start}
-        end={end}
-      />
+      <DateFieldsContext.Provider
+        value={{ date, onChange }}
+      >
+        {children}
+      </DateFieldsContext.Provider>
       <style jsx>{`
         div {
           position: absolute;
@@ -62,7 +32,9 @@ export default function DateFields({
 }
 
 export function DayField(props) {
-  const { date, onChange } = props
+  const { date, onChange } = useContext(
+    DateFieldsContext
+  )
   const value = date.getDate()
   const handleChange = (event) => {
     const newDate = new Date(date.getTime())
@@ -84,7 +56,9 @@ export function DayField(props) {
 }
 
 export function MonthField(props) {
-  const { date, onChange } = props
+  const { date, onChange } = useContext(
+    DateFieldsContext
+  )
   const month = date.getMonth()
   const handleChange = (event) => {
     const newDate = new Date(date.getTime())
@@ -106,7 +80,10 @@ export function MonthField(props) {
 }
 
 export function YearField(props) {
-  const { date, onChange, start, end } = props
+  const { date, onChange } = useContext(
+    DateFieldsContext
+  )
+  const { start, end } = props
   const years = Array.from({
     length: end - start + 1,
   }).map((_, index) => index + start)

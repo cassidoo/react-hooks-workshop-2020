@@ -11,5 +11,11 @@
     "next": "9.4.2",
     "react": "16.13.1",
     "react-dom": "16.13.1"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2
   }
 }

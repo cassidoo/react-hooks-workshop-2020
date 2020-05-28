@@ -11,15 +11,33 @@ import { useState } from 'react'
 // Bonus points: Try making it so the look of the badge changes somehow
 // when you hover over it, perhaps an x for if you're about to dismiss it?
 
-const Badge = () => {
-  return <span>Hello, world!</span>
+const Badge = ({
+  children,
+  color,
+  dismissable,
+}) => {
+  let [dismissed, setDismissed] = useState(false)
+
+  if (dismissed) return null
+
+  return (
+    <span
+      className={`badge ${color}`}
+      onClick={() => {
+        setDismissed(true)
+      }}
+    >
+      {children}
+    </span>
+  )
 }
 
 export default function BadgeList() {
   return (
     <section>
       <h1>Oh boy, statuses!</h1>
-      <Badge color="green">Success</Badge> This is operational. <br />
+      <Badge color="green">Success</Badge> This is
+      operational. <br />
       <Badge color="red" dismissable>
         Removed
       </Badge>{' '}
@@ -28,10 +46,12 @@ export default function BadgeList() {
         Warning
       </Badge>{' '}
       This is a warning. <br />
-      <Badge color="blue">Beta</Badge> This is in progress. <br />
+      <Badge color="blue">Beta</Badge> This is in
+      progress. <br />
       <style jsx global>{`
         section {
-          font-family: 'Helvetica', 'Arial', sans-serif;
+          font-family: 'Helvetica', 'Arial',
+            sans-serif;
           line-height: 1.3;
         }
 

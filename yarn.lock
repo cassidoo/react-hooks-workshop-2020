@@ -2603,6 +2603,11 @@ fragment-cache@^0.2.1:
   dependencies:
     map-cache "^0.2.2"
 
+friendly-words@^1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/friendly-words/-/friendly-words-1.1.10.tgz#66a1f0cdb258fb567a0d68ca37f944cb19405fd6"
+  integrity sha512-KFrW1RS5qr7uIFF3RXITtmTHQhLA0J6htpKkoTcTSNxyXeOTio5venOr8AdOiS9KAQlxhnONcCifyJcj0kM7/A==
+
 from2@^2.1.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/from2/-/from2-2.3.0.tgz#8bfb5502bde4a4d36cfdeea007fcca21d7e382af"
